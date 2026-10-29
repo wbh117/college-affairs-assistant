@@ -1,0 +1,7 @@
+node_modules/
+_tools/result.json
+03_数据/_backup.xlsx
+*.log
+
+# 含个人信息的原始语料，禁止推送（脱敏产物见 01_输出/语料库/咨询问题频次表.md）
+01_素材/咨询群聊记录_原始_含个人信息.csv
