@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a56db">
+<title>学院事务咨询助手</title>
+<style>
+  :root{
+    --blue:#1a56db; --blue-d:#1443ad; --ink:#16202e; --muted:#6b7686;
+    --line:#e3e8ef; --bg:#f5f7fb; --card:#fff; --ok:#0f9d58; --warn:#d97706; --red:#c2410c;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:var(--bg); color:var(--ink); font-size:16px; line-height:1.65;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  header{
+    background:linear-gradient(135deg,#1a56db,#2f6ff0); color:#fff;
+    padding:14px 16px 16px; position:sticky; top:0; z-index:10;
+    box-shadow:0 2px 10px rgba(26,86,219,.18);
+  }
+  header h1{margin:0; font-size:18px; font-weight:700; letter-spacing:.3px}
+  header p{margin:4px 0 0; font-size:12.5px; opacity:.92; line-height:1.5}
+  .wrap{max-width:720px; margin:0 auto; padding:12px 14px 20px}
+  .chips{display:flex; gap:8px; overflow-x:auto; padding:2px 0 10px; scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{
+    flex:0 0 auto; border:1px solid var(--line); background:#fff; color:#374151;
+    padding:6px 12px; border-radius:999px; font-size:13px; cursor:pointer; white-space:nowrap;
+  }
+  .chip:active{background:#eef3ff; border-color:#bfd3ff}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px 15px; margin-bottom:12px}
+  .q{font-size:15px; color:#111827; font-weight:600; margin:0 0 8px; padding-left:14px; position:relative; word-break:break-word}
+  .q::before{content:""; position:absolute; left:0; top:.55em; width:6px; height:6px; border-radius:50%; background:var(--blue)}
+  .sec{margin:9px 0 0; padding:9px 11px; border-radius:9px; font-size:14.5px; word-break:break-word}
+  .sec .lab{font-weight:700; font-size:13px; margin-right:4px; display:inline-block}
+  .concl{background:#eef6ff; border-left:3px solid var(--blue)}
+  .concl .lab{color:var(--blue-d)}
+  .evid{background:#f7faf7; border-left:3px solid var(--ok); color:#1f2937; font-size:13.8px}
+  .evid .lab{color:var(--ok)}
+  .next{background:#fffaf0; border-left:3px solid var(--warn)}
+  .next .lab{color:var(--warn)}
+  .src{margin-top:9px; font-size:12.5px; color:var(--muted); border-top:1px dashed var(--line); padding-top:8px; word-break:break-word}
+  .src b{color:#374151; font-weight:600}
+  .tag{display:inline-block; font-size:11.5px; padding:1px 7px; border-radius:5px; margin-right:6px; vertical-align:1px}
+  .t-hit{background:#e7f6ec; color:#0f7a45}
+  .t-fb{background:#fdecea; color:#b3261e}
+  .t-ho{background:#fff4e5; color:#8a5300}
+  .t-bd{background:#eef2ff; color:#3730a3}
+  .boundary{background:#fff; border:1px solid #ffd8a8}
+  .boundary .raw{font-size:14.5px; color:#1f2937; white-space:pre-wrap; word-break:break-word}
+  form{position:sticky; bottom:0; background:rgba(245,247,251,.96); backdrop-filter:blur(6px);
+       padding:9px 14px calc(9px + env(safe-area-inset-bottom)); border-top:1px solid var(--line); z-index:12}
+  .inbar{max-width:720px; margin:0 auto; display:flex; gap:8px; align-items:flex-end}
+  textarea{
+    flex:1; resize:none; border:1px solid #cfd8e3; border-radius:12px; padding:10px 12px;
+    font-size:15px; font-family:inherit; line-height:1.5; max-height:120px; min-height:44px; background:#fff; color:var(--ink);
+  }
+  textarea:focus{outline:none; border-color:var(--blue); box-shadow:0 0 0 3px rgba(26,86,219,.12)}
+  button.go{
+    border:0; background:var(--blue); color:#fff; border-radius:12px; padding:0 16px; height:44px;
+    font-size:15px; font-weight:600; min-width:64px; cursor:pointer;
+  }
+  button.go:active{background:var(--blue-d)}
+  button.go[disabled]{opacity:.55}
+  .hint{font-size:11.5px; color:var(--muted); text-align:center; margin:6px 0 0}
+  footer{max-width:720px; margin:10px auto 0; padding:0 14px 18px; font-size:12px; color:var(--muted); text-align:center; line-height:1.7}
+  .empty{text-align:center; color:var(--muted); font-size:14px; padding:26px 10px}
+  .empty b{display:block; color:#374151; font-size:15px; margin-bottom:6px}
+  @media (max-width:380px){ .sec{font-size:14px} body{font-size:15px} }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>学院事务咨询助手</h1>
+  <p>可问：补考 · 缓考 · 重修 · 成绩复核 · 奖助学金 · 宿舍报修 · 教室多媒体报修</p>
+</header>
+
+<main class="wrap">
+  <div class="chips" id="chips"></div>
+  <div id="log">
+    <div class="card empty">
+      <b>直接输入你的问题</b>
+      例如"补考申请要在多久内提交？""助学金一等多少钱？""教室投影坏了多久能来修？"<br>
+      回答一律按【结论】【依据】【下一步】三段给出，并标注文件名与条款号。
+    </div>
+  </div>
+</main>
+
+<form id="f" autocomplete="off">
+  <div class="inbar">
+    <textarea id="q" rows="1" placeholder="输入问题，如：缓考要交什么材料？"></textarea>
+    <button class="go" id="go" type="submit">提问</button>
+  </div>
+  <p class="hint">仅依据 5 份现行有效文件作答；资料未收录会明确告知，不推测。</p>
+</form>
+
+<footer>
+  资料以文件生效日期为准：教学管理制度 2024-09-01｜奖助学金办法 2025-03-01｜宿舍报修办法 2024-09-01｜教室多媒体报修流程 2024-09-01｜教务 FAQ 2025-09<br>
+  本工具仅作流程与条款查询，不代替学院人工审核。涉及金额核定、处分认定、学籍个案请转人工。
+</footer>
+
+<script src="qa-core.js"></script>
+<script>
+(function(){
+  var LOG = document.getElementById('log');
+  var QA = window.CollegeQA;
+
+  var SUGGEST = ['补考申请多久内提交？','缓考要交什么材料？','重修最多几次？','成绩复核能重新看卷子吗？',
+                 '助学金一等多少钱？','国奖和励志能同时拿吗？','宿舍漏水多久来人？','教室投影坏了多久能修？'];
+
+  var chips = document.getElementById('chips');
+  SUGGEST.forEach(function(t){
+    var b = document.createElement('button');
+    b.className = 'chip'; b.type = 'button'; b.textContent = t;
+    b.onclick = function(){ ask(t); };
+    chips.appendChild(b);
+  });
+
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+
+  function card(q, a){
+    var el = document.createElement('div');
+    el.className = 'card';
+    var html = '<p class="q">' + esc(q) + '</p>';
+
+    if (a.type === 'hit') {
+      html += '<div class="sec concl"><span class="lab">【结论】</span>' + esc(a.结论) + '</div>';
+      html += '<div class="sec evid"><span class="lab">【依据】</span>' + esc(a.依据).replace(/\n/g,'<br>') + '</div>';
+      html += '<div class="sec next"><span class="lab">【下一步】</span>' + esc(a.下一步) + '</div>';
+      html += '<div class="src"><span class="tag t-hit">已收录</span>';
+      (a.sources || []).forEach(function(s, i){
+        html += (i ? '<br>' : '') + '<b>' + esc(s.file) + '</b>　' + esc(s.article) + '｜' + esc(s.version) + '｜维护：' + esc(s.dept);
+      });
+      html += '</div>';
+    } else if (a.type === 'fallback') {
+      html += '<div class="sec concl boundary"><span class="tag t-fb">资料未收录</span><div class="raw">' + esc(a.raw) + '</div></div>';
+    } else if (a.type === 'handover') {
+      html += '<div class="sec next"><span class="tag t-ho">需人工确认</span><div class="raw">' + esc(a.raw) + '</div></div>';
+    } else {
+      html += '<div class="sec concl boundary"><span class="tag t-bd">超出服务范围</span>';
+      html += '<div class="raw"><b>【结论】</b>' + esc(a.结论) + '</div>';
+      html += '<div class="raw" style="margin-top:6px"><b>【下一步】</b>' + esc(a.下一步) + '</div></div>';
+    }
+    el.innerHTML = html;
+    LOG.appendChild(el);
+    el.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  function ask(text){
+    var q = (text || '').trim();
+    if (!q) return;
+    var emptyEl = LOG.querySelector('.empty');
+    if (emptyEl) emptyEl.remove();
+    var a = QA.answer(q);
+    card(q, a);
+  }
+
+  document.getElementById('f').addEventListener('submit', function(e){
+    e.preventDefault();
+    var ta = document.getElementById('q');
+    ask(ta.value);
+    ta.value = ''; ta.style.height = 'auto';
+  });
+
+  var ta = document.getElementById('q');
+  ta.addEventListener('input', function(){
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  });
+  ta.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('go').click(); }
+  });
+
+  // 初始化知识库
+  fetch('kb.json', {cache:'no-cache'}).then(function(r){ return r.json(); }).then(function(kb){
+    var n = QA.init(kb);
+    console.log('kb loaded:', n);
+  }).catch(function(err){
+    console.error('kb.json 加载失败', err);
+  });
+})();
+</script>
+</body>
+</html>
